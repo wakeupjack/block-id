@@ -1,29 +1,28 @@
-import '@/styles/globals.css'; // Path ini sekarang akan berfungsi
+import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { WagmiConfig } from 'wagmi';
-import { config as wagmiConfig } from '@/wagmi'; // Path ini juga akan berfungsi
+import { WagmiProvider } from 'wagmi';
+import { config as wagmiConfig } from '@/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+import theme from '@/theme'; // <-- Impor tema kustom Anda
 
-// ... sisa kode tetap sama
-const darkTheme = createTheme({
-  palette: {
-    mode: 'light',
-  },
-});
-
-const queryClient = new QueryClient();
-
+// Versi final dari _app.tsx yang mengintegrasikan semua perbaikan dan tema
 export default function App({ Component, pageProps }: AppProps) {
+  // Gunakan React.useState untuk memastikan QueryClient hanya dibuat sekali
+  // di sisi klien, yang mencegah masalah dengan re-rendering.
+  const [queryClient] = React.useState(() => new QueryClient());
+
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig}> 
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={darkTheme}>
-          <CssBaseline />
+        {/* Gunakan ThemeProvider dengan tema kustom Anda yang sudah diimpor */}
+        <ThemeProvider theme={theme}>
+          <CssBaseline /> {/* Mereset CSS dan menerapkan warna latar belakang dari tema */}
           <Component {...pageProps} />
         </ThemeProvider>
       </QueryClientProvider>
-    </WagmiConfig>
+    </WagmiProvider>
   );
 }
