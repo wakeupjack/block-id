@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Chip, Stack } from '@mui/material';
+// Hapus 'Box' dari sini karena tidak terpakai
+import { AppBar, Toolbar, Typography, Button, Stack, Chip } from '@mui/material'; 
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import Link from 'next/link';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
@@ -30,8 +31,6 @@ const Navbar: React.FC = () => {
 
         <Stack direction="row" alignItems="center" spacing={1}>
           <Button component={Link} href="/" color="inherit">Home</Button>
-          {/* Tambahkan link ke Whitepaper jika ada */}
-          {/* <Button component={Link} href="/whitepaper" color="inherit">Whitepaper</Button> */}
           
           {isClient && (
             <>

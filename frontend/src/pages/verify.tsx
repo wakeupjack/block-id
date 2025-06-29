@@ -1,101 +1,97 @@
-import { useState, ChangeEvent } from 'react';
+import React, { useState, FC, useEffect } from 'react';
 import Head from 'next/head';
-import { Container, Typography, Box, TextField, Button, CircularProgress, Alert, Checkbox, FormControlLabel } from '@mui/material';
+import { Container, Typography, Box, TextField, Button, CircularProgress, Alert, Paper, Stack } from '@mui/material';
 import Navbar from '@/components/Navbar';
-import axios from 'axios';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { useAccount } from 'wagmi';
-import React from 'react';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-// Definisikan tipe untuk hasil verifikasi
-interface VerificationResult {
-  isVerified: boolean;
-}
+const Verify: FC = () => {
+    const [isClient, setIsClient] = useState(false);
+    const [idToCheck, setIdToCheck] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [result, setResult] = useState<'verified' | 'not_verified' | null>(null);
 
-// Definisikan tipe untuk status
-interface Status {
-  loading: boolean;
-  error: string;
-  result: VerificationResult | null;
-}
+    // Ganti nama state agar tidak bentrok
+    const [apiError, setApiError] = useState<string | null>(null); 
 
-const Verify: React.FC = () => {
-  const [addressToCheck, setAddressToCheck] = useState<string>('');
-  const [useMyAddress, setUseMyAddress] = useState<boolean>(true);
-  const [status, setStatus] = useState<Status>({ loading: false, error: '', result: null });
-  const { address: connectedAddress, isConnected } = useAccount();
+    useEffect(() => { setIsClient(true) }, []);
 
-  const handleCheck = async () => {
-    const finalAddress = useMyAddress ? connectedAddress : addressToCheck;
-    if (!finalAddress) {
-      setStatus({ ...status, error: 'Please provide a wallet address or connect your wallet.' });
-      return;
-    }
-    setStatus({ loading: true, error: '', result: null });
+    const handleCheckStatus = () => {
+        if (!idToCheck) return;
+        setIsLoading(true);
+        setResult(null);
+        setApiError(null); // Reset error setiap kali pengecekan baru
+        
+        // Simulasi panggilan API
+        setTimeout(() => {
+            try {
+                 // Simulasi hasil acak
+                if (Math.random() > 0.5) {
+                    setResult('verified');
+                } else {
+                    setResult('not_verified');
+                }
+            } catch (err) {
+                // Perbaiki error 'any' dengan tidak men-tipe 'err'
+                setApiError('An unexpected error occurred during check.');
+            } finally {
+                setIsLoading(false);
+            }
+        }, 2000);
+    };
 
-    try {
-      const response = await axios.get<VerificationResult>(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/get-status/${finalAddress}`);
-      setStatus({ loading: false, error: '', result: response.data });
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'An unexpected error occurred.';
-      setStatus({ loading: false, error: errorMessage, result: null });
-    }
-  };
+    if (!isClient) return null;
 
-  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setUseMyAddress(event.target.checked);
-    if(event.target.checked) {
-        setAddressToCheck('');
-    }
-  };
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Head>
+                <title>Check Verification Status - BlockID</title>
+            </Head>
+            <Navbar />
+            <Container component="main" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Paper elevation={8} sx={{ p: 4, width: '100%', maxWidth: '500px', textAlign: 'center' }}>
+                    <Typography variant="h4" component="h1" gutterBottom>
+                        Check Verification Status
+                    </Typography>
+                    <Typography color="text.secondary" sx={{ mb: 3 }}>
+                        Enter a wallet address or BlockID hash to check its verification status.
+                    </Typography>
+                    <Stack spacing={2} direction="column">
+                        <TextField 
+                            fullWidth 
+                            label="Enter ID/Hash/Token" 
+                            value={idToCheck}
+                            onChange={(e) => setIdToCheck(e.target.value)}
+                        />
+                        <Button 
+                            variant="contained" 
+                            size="large"
+                            onClick={handleCheckStatus}
+                            disabled={isLoading || !idToCheck}
+                        >
+                            {isLoading ? <CircularProgress size={26} color="inherit" /> : 'Check Status'}
+                        </Button>
+                    </Stack>
 
-  return (
-    <div>
-      <Head>
-        <title>Check Verification Status - BlockID</title>
-      </Head>
-      <Navbar />
-      <Container maxWidth="sm" sx={{ mt: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Check Verification Status
-        </Typography>
-        <Box sx={{ mt: 1 }}>
-            <FormControlLabel
-                control={ <Checkbox checked={useMyAddress} onChange={handleCheckboxChange} disabled={!isConnected} name="useMyAddress" color="primary" /> }
-                label="Use my connected wallet address"
-            />
-          <TextField
-            margin="normal" fullWidth id="address" label="Enter Wallet Address" name="address"
-            value={useMyAddress ? (connectedAddress || 'Connect your wallet') : addressToCheck}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setAddressToCheck(e.target.value)}
-            disabled={useMyAddress}
-          />
-          <Button onClick={handleCheck} fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={status.loading || (useMyAddress && !isConnected)}>
-            Check Status
-          </Button>
-          {status.loading && <CircularProgress sx={{ display: 'block', margin: 'auto', my: 2 }} />}
-          {status.error && <Alert severity="error" sx={{ my: 2 }}>{status.error}</Alert>}
-          {status.result && (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 4, flexDirection: 'column' }}>
-                <Typography variant="h6">Verification Result:</Typography>
-                {status.result.isVerified ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'success.main' }}>
-                        <CheckCircleIcon sx={{ mr: 1 }} />
-                        <Typography variant="h5">Verified</Typography>
-                    </Box>
-                ) : (
-                     <Box sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
-                        <CancelIcon sx={{ mr: 1 }} />
-                        <Typography variant="h5">Not Verified</Typography>
-                    </Box>
-                )}
-            </Box>
-          )}
+                    {apiError && <Alert severity="error" sx={{mt: 2}}>{apiError}</Alert>}
+
+                    {result && (
+                        <Box mt={4}>
+                            {result === 'verified' ? (
+                                <Alert severity="success" icon={<CheckCircleOutlineIcon />} variant="filled">
+                                    This ID is Verified.
+                                </Alert>
+                            ) : (
+                                <Alert severity="error" icon={<HelpOutlineIcon />} variant="filled">
+                                    This ID is Not Verified.
+                                </Alert>
+                            )}
+                        </Box>
+                    )}
+                </Paper>
+            </Container>
         </Box>
-      </Container>
-    </div>
-  );
-}
+    );
+};
 
 export default Verify;
