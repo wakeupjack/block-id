@@ -31,6 +31,7 @@ const Navbar: React.FC = () => {
 
         <Stack direction="row" alignItems="center" spacing={1}>
           <Button component={Link} href="/" color="inherit">Home</Button>
+          <Button component={Link} href="/badge" color="inherit">Badge</Button>
           
           {isClient && (
             <>
