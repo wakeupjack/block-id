@@ -6,10 +6,8 @@ import {
   Box, 
   Button, 
   Stack, 
-  Grid, 
   Card, 
   CardContent,
-  Chip,
   Avatar,
   Fade,
   Grow,
@@ -24,7 +22,6 @@ import {
   Public, 
   Shield, 
   Lock,
-  Visibility,
   Group,
   CheckCircle,
   ArrowForward
@@ -34,14 +31,10 @@ import Link from 'next/link';
 
 const Home: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const theme = useTheme();
 
   useEffect(() => {
     setIsVisible(true);
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const features = [
@@ -98,7 +91,7 @@ const Home: React.FC = () => {
         flexDirection: 'column', 
         minHeight: '100vh',
         position: 'relative',
-        overflow: 'hidden',
+        overflowX: 'hidden', // Prevent horizontal scroll
     }}>
       <Head>
         <title>BlockID - Protect Your Identity with Blockchain</title>
@@ -194,20 +187,6 @@ const Home: React.FC = () => {
       >
         <Fade in={isVisible} timeout={1000}>
           <Box sx={{ maxWidth: '900px', width: '100%' }}>
-            {/* <Chip 
-              label="" 
-              sx={{ 
-                mb: 4,
-                background: alpha(theme.palette.primary.main, 0.1),
-                color: theme.palette.primary.light,
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
-                fontWeight: 600,
-                px: 3,
-                py: 1.5,
-                fontSize: '0.9rem',
-              }}
-            /> */}
-            
             <Typography 
               variant="h1" 
               component="h1" 
@@ -232,7 +211,7 @@ const Home: React.FC = () => {
             
             <Typography 
               variant="h5" 
-              paragraph 
+              component="div" // Changed to div to avoid paragraph nesting issues
               sx={{ 
                 maxWidth: '700px', 
                 mx: 'auto',
@@ -312,12 +291,26 @@ const Home: React.FC = () => {
           </Box>
         </Fade>
 
-        {/* Stats Section */}
+        {/* ✅ REFACTORED: Stats Section with Flexbox */}
         <Grow in={isVisible} timeout={1500}>
-          <Box sx={{ width: '100%', maxWidth: '1000px' }}>
-            <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
+            <Box 
+              sx={{ 
+                width: '100%', 
+                maxWidth: '1000px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: 4, // Replaces spacing
+              }}
+            >
               {stats.map((stat, index) => (
-                <Grid item xs={6} sm={3} key={index}>
+                <Box 
+                  key={index}
+                  sx={{
+                    width: { xs: 'calc(50% - 16px)', sm: 'calc(25% - 24px)'}, // Replaces xs={6} sm={3} and considers gap
+                    minWidth: { xs: 140, sm: 160 } // Prevents items from becoming too small
+                  }}
+                >
                   <Paper
                     elevation={0}
                     sx={{
@@ -371,14 +364,13 @@ const Home: React.FC = () => {
                       {stat.label}
                     </Typography>
                   </Paper>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
-          </Box>
+            </Box>
         </Grow>
       </Container>
 
-      {/* Features Section */}
+      {/* ✅ REFACTORED: Features Section with Flexbox */}
       <Container maxWidth="lg" sx={{ py: { xs: 6, sm: 8, md: 10 } }}>
         <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography 
@@ -396,6 +388,7 @@ const Home: React.FC = () => {
           </Typography>
           <Typography 
             variant="h6" 
+            component="p"
             sx={{ 
               color: alpha(theme.palette.common.white, 0.8),
               maxWidth: '600px',
@@ -407,9 +400,19 @@ const Home: React.FC = () => {
           </Typography>
         </Box>
 
-        <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: 4, // Replaces spacing
+        }}>
           {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} lg={3} key={index}>
+            <Box 
+              key={index}
+              sx={{
+                width: { xs: '100%', sm: 'calc(50% - 16px)', lg: 'calc(25% - 24px)'}, // Replaces xs={12} sm={6} lg={3}
+              }}
+            >
               <Grow in={isVisible} timeout={1000 + index * 200}>
                 <Card
                   elevation={0}
@@ -435,6 +438,7 @@ const Home: React.FC = () => {
                     </Box>
                     <Typography 
                       variant="h6" 
+                      component="div"
                       sx={{ 
                         fontWeight: 600, 
                         color: theme.palette.common.white, 
@@ -446,6 +450,7 @@ const Home: React.FC = () => {
                     </Typography>
                     <Typography 
                       variant="body2" 
+                      component="p"
                       sx={{ 
                         color: alpha(theme.palette.common.white, 0.7),
                         textAlign: 'center',
@@ -457,12 +462,12 @@ const Home: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grow>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
 
-      {/* How It Works Section */}
+      {/* ✅ REFACTORED: How It Works Section with Flexbox */}
       <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, background: alpha(theme.palette.common.white, 0.02) }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -481,6 +486,7 @@ const Home: React.FC = () => {
             </Typography>
             <Typography 
               variant="h6" 
+              component="p"
               sx={{ 
                 color: alpha(theme.palette.common.white, 0.8),
                 maxWidth: '600px',
@@ -492,16 +498,27 @@ const Home: React.FC = () => {
             </Typography>
           </Box>
 
-          <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
+          <Box sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 4,
+          }}>
             {steps.map((step, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Box 
+                key={index}
+                sx={{
+                  width: { xs: '100%', md: 'calc(33.33% - 22px)'}, // Replaces xs={12} md={4}
+                }}
+              >
                 <Grow in={isVisible} timeout={1500 + index * 300}>
                   <Box sx={{ 
                     textAlign: 'center',
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    p: 2
                   }}>
                     <Avatar
                       sx={{
@@ -517,6 +534,7 @@ const Home: React.FC = () => {
                     </Avatar>
                     <Typography 
                       variant="h5" 
+                      component="div"
                       sx={{ 
                         fontWeight: 600, 
                         color: theme.palette.common.white, 
@@ -528,6 +546,7 @@ const Home: React.FC = () => {
                     </Typography>
                     <Typography 
                       variant="body1" 
+                      component="p"
                       sx={{ 
                         color: alpha(theme.palette.common.white, 0.7),
                         lineHeight: 1.6,
@@ -538,9 +557,9 @@ const Home: React.FC = () => {
                     </Typography>
                   </Box>
                 </Grow>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Container>
       </Box>
 
@@ -573,6 +592,7 @@ const Home: React.FC = () => {
             </Typography>
             <Typography 
               variant="h6" 
+              component="p"
               sx={{ 
                 color: alpha(theme.palette.common.white, 0.8),
                 mb: 6,
@@ -594,6 +614,8 @@ const Home: React.FC = () => {
               <Button 
                 variant="contained" 
                 size="large"
+                component={Link}
+                href="/register"
                 endIcon={<ArrowForward />}
                 sx={{
                   py: 2.5,
@@ -618,6 +640,8 @@ const Home: React.FC = () => {
               <Button 
                 variant="outlined" 
                 size="large"
+                component={Link}
+                href="/about"
                 sx={{
                   py: 2.5,
                   px: 5,
