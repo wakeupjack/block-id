@@ -671,3 +671,6 @@ const Home: React.FC = () => {
 }
 
 export default Home;
+
+
+/// duh panjang bgt le, need refactor buat meringkas kode ...

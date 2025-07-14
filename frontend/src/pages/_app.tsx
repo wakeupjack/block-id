@@ -6,7 +6,7 @@ import { WagmiProvider } from 'wagmi';
 import { config as wagmiConfig } from '@/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import theme from '@/theme'; // <-- Impor tema kustom Anda
+import theme from '@/theme'; // custom theme here
 
 // Versi final dari _app.tsx yang mengintegrasikan semua perbaikan dan tema
 export default function App({ Component, pageProps }: AppProps) {
