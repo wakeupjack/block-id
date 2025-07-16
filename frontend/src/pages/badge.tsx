@@ -277,3 +277,5 @@ export default function Badge() {
     </div>
   );
 }
+
+// badge still error, fix lagi nanti 
