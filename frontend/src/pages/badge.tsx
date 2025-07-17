@@ -278,4 +278,4 @@ export default function Badge() {
   );
 }
 
-// badge still error, fix lagi nanti 
+// badge still error, fix lagi nanti yaaaaaaaaaaaaa
